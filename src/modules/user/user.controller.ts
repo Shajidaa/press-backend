@@ -2,12 +2,13 @@ import { Request, Response } from "express";
 
 import httpStatus from "http-status";
 import { userService } from "./user.service";
+import sendResponse from "../../utility/sendRespone";
 const createdUser = async (req: Request, res: Response) => {
   try {
     const payload = req.body;
     const result = await userService.createUserFromDB(payload);
 
-    res.status(201).json({
+    sendResponse(res, {
       success: true,
       statusCode: httpStatus.CREATED,
       message: "user created",
@@ -16,7 +17,7 @@ const createdUser = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+    sendResponse(res, {
       success: false,
       statusCode: httpStatus.INTERNAL_SERVER_ERROR,
       message: (error as Error).message,
