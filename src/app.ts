@@ -6,7 +6,12 @@ const app: Application = Express();
 
 app.use(Express.json());
 app.use(Express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.APP_URL,
+    credentials: true,
+  }),
+);
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
