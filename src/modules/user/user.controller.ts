@@ -5,6 +5,9 @@ import { userService } from "./user.service";
 import sendResponse from "../../utils/sendResponse";
 import { catchAsync } from "../../utils/catchAsync";
 
+import config from "../../config";
+import { jwtUtils } from "../../utils/jwt";
+
 const createdUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payload = req.body;
@@ -20,6 +23,37 @@ const createdUser = catchAsync(
     });
   },
 );
+
+const getProfile = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { accessToken } = req.cookies;
+
+    const verifiedToken = jwtUtils.verifyToken(
+      accessToken,
+      config.JWT_ACCESS_SECRET,
+    );
+
+    if (typeof verifiedToken === "string") {
+      throw new Error(verifiedToken);
+    }
+
+    // 3. Ensure the id exists on the payload
+    if (!verifiedToken || !verifiedToken.id) {
+      throw new Error("Unauthorized: Invalid token payload");
+    }
+
+    // 4. Fetch profile using the verified ID
+    const profile = await userService.getMyProfile(verifiedToken.id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Get my profile successfully",
+      data: profile,
+    });
+  },
+);
 export const userController = {
   createdUser,
+  getProfile,
 };
