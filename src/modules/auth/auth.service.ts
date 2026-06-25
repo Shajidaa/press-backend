@@ -1,8 +1,11 @@
+import jwt, { SignOptions } from "jsonwebtoken";
 import { prisma } from "../../lib/prisma";
 import bcrypt from "bcrypt";
+import config from "../../config";
+import { jwtUtils } from "../../utils/jwt";
 const loginFromDB = async (payload: any) => {
   const { email, password } = await payload;
-  // console.log(result);
+
   const user = await prisma.user.findUniqueOrThrow({
     where: { email },
   });
@@ -11,7 +14,34 @@ const loginFromDB = async (payload: any) => {
   if (!isPasswordMatched) {
     throw new Error("Password is incorrect");
   }
-  return user;
+  const jwtPayload = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
+  // const accessToken = jwt.sign(
+  //   jwtPayload,
+  //   config.JWT_ACCESS_SECRET as string,
+  //   {
+  //     expiresIn: config.JWT_ACCESS_EXPIRES_IN,
+  //   } as SignOptions,
+  // );
+
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.JWT_ACCESS_SECRET,
+
+    config.JWT_ACCESS_EXPIRES_IN as SignOptions,
+  );
+
+  const refreshToken = jwtUtils.createToken(
+    jwtPayload,
+    config.JWT_REFRESH_SECRET,
+
+    config.JWT_REFRESH_EXPIRES_IN as SignOptions,
+  );
+  return { accessToken, refreshToken };
 };
 
 export const authService = {

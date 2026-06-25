@@ -11,7 +11,7 @@ const login = catchAsync(
       success: true,
       statusCode: httpStatus.OK,
       message: "User login successfully",
-      data: { result },
+      data: result,
     });
   },
 );
