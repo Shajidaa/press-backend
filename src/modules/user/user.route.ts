@@ -6,4 +6,9 @@ const router = Router();
 
 router.post("/register", userController.createdUser);
 router.get("/me", auth(Role.USER, Role.ADMIN), userController.getProfile);
+router.put(
+  "/my-profile",
+  auth(Role.USER, Role.ADMIN),
+  userController.updateProfile,
+);
 export const userRouter = router;

@@ -7,7 +7,7 @@ import { catchAsync } from "../../utils/catchAsync";
 
 import config from "../../config";
 import { jwtUtils } from "../../utils/jwt";
-import { JwtPayload } from "jsonwebtoken";
+import { log } from "console";
 
 const createdUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -38,25 +38,38 @@ const getProfile = catchAsync(
     if (typeof verifiedToken === "string") {
       throw new Error(verifiedToken);
     }
-    // console.log("verified token", verifiedToken);
-    const id = verifiedToken.data?.id as string;
-    // 3. Ensure the id exists on the payload
+
     if (!verifiedToken || !verifiedToken.data?.id) {
       throw new Error("Unauthorized: Invalid token payload");
     }
 
-    // 4. Fetch profile using the verified ID
     const profile = await userService.getMyProfile(verifiedToken.data.id);
 
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
       message: "Get my profile successfully",
-      data: profile,
+      data: { profile },
+    });
+  },
+);
+const updateProfile = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id as string;
+    const payload = req.body;
+
+    const result = await userService.updateMyProfile(userId, payload);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Update my profile successfully!",
+      data: result,
     });
   },
 );
 export const userController = {
   createdUser,
   getProfile,
+  updateProfile,
 };

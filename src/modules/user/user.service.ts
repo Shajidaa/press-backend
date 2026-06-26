@@ -54,7 +54,31 @@ const getMyProfile = async (userId: string) => {
   });
   return user;
 };
+const updateMyProfile = async (userId: string, payload: any) => {
+  const { name, password, profilePhoto, bio } = payload;
+  const updateProfile = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      name,
+      password,
+      profile: {
+        update: {
+          profilePhoto,
+          bio,
+        },
+      },
+    },
+    omit: {
+      password: true,
+    },
+    include: {
+      profile: true,
+    },
+  });
+  return updateProfile;
+};
 export const userService = {
   createUserFromDB,
   getMyProfile,
+  updateMyProfile,
 };
