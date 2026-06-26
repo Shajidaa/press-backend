@@ -7,6 +7,7 @@ import { catchAsync } from "../../utils/catchAsync";
 
 import config from "../../config";
 import { jwtUtils } from "../../utils/jwt";
+import { JwtPayload } from "jsonwebtoken";
 
 const createdUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -38,7 +39,7 @@ const getProfile = catchAsync(
       throw new Error(verifiedToken);
     }
     // console.log("verified token", verifiedToken);
-
+    const id = verifiedToken.data?.id as string;
     // 3. Ensure the id exists on the payload
     if (!verifiedToken || !verifiedToken.data?.id) {
       throw new Error("Unauthorized: Invalid token payload");
