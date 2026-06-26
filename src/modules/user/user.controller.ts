@@ -32,18 +32,20 @@ const getProfile = catchAsync(
       accessToken,
       config.JWT_ACCESS_SECRET,
     );
+    // console.log(accessToken);
 
     if (typeof verifiedToken === "string") {
       throw new Error(verifiedToken);
     }
+    // console.log("verified token", verifiedToken);
 
     // 3. Ensure the id exists on the payload
-    if (!verifiedToken || !verifiedToken.id) {
+    if (!verifiedToken || !verifiedToken.data?.id) {
       throw new Error("Unauthorized: Invalid token payload");
     }
 
     // 4. Fetch profile using the verified ID
-    const profile = await userService.getMyProfile(verifiedToken.id);
+    const profile = await userService.getMyProfile(verifiedToken.data.id);
 
     sendResponse(res, {
       success: true,

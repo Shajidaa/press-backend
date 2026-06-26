@@ -1,5 +1,11 @@
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 
+export interface CustomJwtPayload extends JwtPayload {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
 const createToken = (
   payload: JwtPayload,
   secret: string,
@@ -14,10 +20,16 @@ const createToken = (
 const verifyToken = (token: string, secret: string) => {
   try {
     const verifiedToken = jwt.verify(token, secret);
-    return verifiedToken;
-  } catch (error) {
+    return {
+      success: true,
+      data: verifiedToken,
+    };
+  } catch (error: any) {
     console.log("Token verification failed:", error);
-    throw new Error("Invalid Token");
+    return {
+      success: false,
+      error: error.message,
+    };
   }
 };
 
