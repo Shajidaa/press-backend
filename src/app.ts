@@ -1,11 +1,10 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import Express, { Application, Request, Response } from "express";
-import { prisma } from "./lib/prisma";
-import bcrypt from "bcrypt";
-import httpStatus from "http-status";
+import Express, { Application } from "express";
+
 import { userRouter } from "./modules/user/user.route";
 import { authRouter } from "./modules/auth/auth.route";
+import { postRouter } from "./modules/post/post.route";
 const app: Application = Express();
 
 app.use(Express.json());
@@ -24,4 +23,5 @@ app.get("/", (req, res) => {
 
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/posts", postRouter);
 export default app;
