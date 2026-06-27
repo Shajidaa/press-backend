@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { prisma } from "../../lib/prisma";
 import { UserPayload } from "./user.interface";
+import config from "../../config";
 
 const createUserFromDB = async (payload: UserPayload) => {
   const { name, email, password, profilePhoto } = payload;
@@ -56,6 +57,10 @@ const getMyProfile = async (userId: string) => {
 };
 const updateMyProfile = async (userId: string, payload: any) => {
   const { name, password, profilePhoto, bio } = payload;
+  const hashPassword = bcrypt.hash(
+    password,
+    config.BCRYPT_SALT_ROUNDS as string,
+  );
   const updateProfile = await prisma.user.update({
     where: { id: userId },
     data: {
@@ -68,9 +73,7 @@ const updateMyProfile = async (userId: string, payload: any) => {
         },
       },
     },
-    omit: {
-      password: true,
-    },
+
     include: {
       profile: true,
     },
