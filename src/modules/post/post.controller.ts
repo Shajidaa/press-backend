@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 import { postService } from "./post.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import { log } from "node:console";
 const createdPost = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.user?.id;
@@ -15,6 +16,7 @@ const createdPost = catchAsync(
     });
   },
 );
+
 const getAllPost = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const result = await postService.getAllPostDB();
@@ -26,14 +28,42 @@ const getAllPost = catchAsync(
     });
   },
 );
+
 const getPostStats = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {},
 );
 const getMyPosts = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {},
+  async (req: Request, res: Response, next: NextFunction) => {
+    const authorId = await req.user?.id;
+    if (!authorId) {
+      throw new Error("user id not found!");
+    }
+    const result = await postService.getMyPostsDB(authorId as string);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "get my all post successfully!",
+      data: result,
+    });
+  },
 );
 const getMyPostByID = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {},
+  async (req: Request, res: Response, next: NextFunction) => {
+    const postId = req.params.postId;
+    console.log(req.params);
+    if (!postId) {
+      throw new Error("Post id not found");
+    }
+
+    const result = await postService.getMyPostByIdDB(postId as string);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "get single post successfully!",
+      data: result,
+    });
+  },
 );
 const updatePost = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {},
