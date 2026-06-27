@@ -3,7 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 import { postService } from "./post.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
-import { log } from "node:console";
+
 const createdPost = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.user?.id;
@@ -66,10 +66,50 @@ const getMyPostByID = catchAsync(
   },
 );
 const updatePost = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {},
+  async (req: Request, res: Response, next: NextFunction) => {
+    const authorId = await req.user?.id;
+    const isAdmin = await req.user?.role;
+    const postId = await req.params.postId;
+    const payload = await req.body;
+    if (!postId) {
+      throw new Error("Post id not found");
+    }
+
+    if (!authorId) {
+      throw new Error("user id not found!");
+    }
+
+    const result = await postService.updatePostDB(
+      postId as string,
+      payload,
+      authorId,
+      isAdmin as string,
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Update single post successfully!",
+      data: result,
+    });
+  },
 );
 const deletePost = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {},
+  async (req: Request, res: Response, next: NextFunction) => {
+    const authorId = await req.user?.id;
+    const isAdmin = (await req.user?.role) === "ADMIN";
+    const postId = await req.params.postId;
+    const result = await postService.deletedPostDb(
+      postId as string,
+      authorId as string,
+      isAdmin,
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Post deleted successfully!",
+      data: result,
+    });
+  },
 );
 export const postController = {
   createdPost,
