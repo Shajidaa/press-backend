@@ -25,5 +25,5 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/posts", postRouter);
-app.use("api/comments", commentRouter);
+app.use("/api/comments", commentRouter);
 export default app;
