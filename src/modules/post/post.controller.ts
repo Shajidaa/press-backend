@@ -30,7 +30,16 @@ const getAllPost = catchAsync(
 );
 
 const getPostStats = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {},
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await postService.getPostStatsDB();
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Post stats retrieved successfully",
+      data: result,
+    });
+  },
 );
 const getMyPosts = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -51,7 +60,7 @@ const getMyPosts = catchAsync(
 const getMyPostByID = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const postId = req.params.postId;
-    console.log(req.params);
+    // console.log(req.params);
     if (!postId) {
       throw new Error("Post id not found");
     }
